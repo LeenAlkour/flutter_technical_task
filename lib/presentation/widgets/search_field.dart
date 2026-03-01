@@ -31,7 +31,7 @@ class _SearchFieldState extends State<SearchField> {
   }
 
   final TextEditingController _searchController = TextEditingController();
-  final Debouncer _debouncer = Debouncer(milliseconds: 500);
+  final Debouncer _debouncer = Debouncer(milliseconds: 50);
   @override
   Widget build(BuildContext context) {
     return Padding(

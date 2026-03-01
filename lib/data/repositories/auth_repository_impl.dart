@@ -1,4 +1,5 @@
 import 'package:dartz/dartz.dart';
+import 'package:technical_task/core/errors/error_handler.dart';
 import 'package:technical_task/core/errors/failure.dart';
 import 'package:technical_task/core/network/network_info.dart';
 import 'package:technical_task/data/model/shop_model.dart';
@@ -18,16 +19,17 @@ class ShopRepositoryImpl implements ShopRepository {
   @override
   Future<Either<Failure,List<ShopEntity>>> getAllShops() async {
     try {
+      if (! await networkInfo.isConnected){
+        return Left(Failure(message: "no intarnet"));
+      }
       final result = await remoteDataSource.getAllShops();
-      print("999999999999999999999999");
 
       final entities = result.map((shop) => shop.toEntity()).toList();
-      print("2222222222222222222222222");
 
       return Right(entities);
+
     } catch (e) {
-      print("444444444444");
-      return Left(Failure(message: e.toString()));
+      return Left(ErrorHandler.handle(e));
     }
   }
 }
