@@ -11,36 +11,50 @@ class SearchField extends StatefulWidget {
 }
 
 class _SearchFieldState extends State<SearchField> {
+  late final TextEditingController _searchController;
+  late final Debouncer _debouncer;
+
   @override
   void initState() {
     super.initState();
-    _searchController.addListener(() {
-      _debouncer.run(() => _performSearch(_searchController.text));
-    });
+    _searchController = TextEditingController();
+    _debouncer = Debouncer(milliseconds: 500); 
+
+    _searchController.addListener(_onSearchChanged);
   }
 
-  void _performSearch(String query) {
-    context.read<ShopCubit>().search;
+  void _onSearchChanged() {
+    _debouncer.run(() => _performSearch(_searchController.text));
+  }
+
+  Future<void> _performSearch(String query) async {
+    if (query.isNotEmpty) {
+      if (mounted) {
+        context.read<ShopCubit>().search(
+          query,
+        );
+      }
+    }
   }
 
   @override
   void dispose() {
+    _searchController.removeListener(_onSearchChanged);
     _searchController.dispose();
     _debouncer.dispose();
     super.dispose();
   }
 
-  final TextEditingController _searchController = TextEditingController();
-  final Debouncer _debouncer = Debouncer(milliseconds: 50);
   @override
   Widget build(BuildContext context) {
     return Padding(
-      padding: const EdgeInsets.all(12),
+      padding: const EdgeInsets.all(12.0), 
       child: TextField(
         controller: _searchController,
         decoration: const InputDecoration(
           hintText: "Search...",
           border: OutlineInputBorder(),
+          prefixIcon: Icon(Icons.search), 
         ),
       ),
     );
